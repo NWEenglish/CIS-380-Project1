@@ -121,6 +121,6 @@ class Player(Character):
             self.last_hit = now
 
     def reset_loc(self):
-        self.x = 0
-        self.y = 0
+        self.x = 200
+        self.y = 200
 

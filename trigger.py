@@ -9,9 +9,8 @@ class Trigger(DGameObject):
         self.rect.y = y
         self._layer = z
 
-    def move_right(self):
-        """Test"""
-        self.rect.x += 25
+    def get_location(self):
+        return (self.rect.x, self.rect.y)
 
     def set_location(self, z, x, y):
         self._layer = z

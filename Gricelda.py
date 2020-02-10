@@ -13,14 +13,14 @@ sys.path.append('..')
 def main():
     """Just used to set up the engine and screen"""
 
-    league.Settings.width = 928
-    league.Settings.height = 600
-    "Sets the size of the window"
+    league.Settings.width = 800
+    league.Settings.height = 640
+    "Sets the size of the window. 800 x 640 is 25 x 20 32bit sprites"
 
     engine = league.Engine("Gricelda")
     engine.init_pygame()
 
-    user = Player(2)
+    user = Player(10)
     engine.objects.append(user)
 
     screen = Screen(user, engine)
