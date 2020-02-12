@@ -190,6 +190,7 @@ class Player(Character):
         self.sword.x = self.x - 64
         self.sword.y = self.y - 64
         self.sword.direction = self.direction
+        self.sword.attack_update()
         if not self.setState(State.MELEE):
             self.current_frame = (self.current_frame + 1) % (self.melee_length)
             self.sword.current_frame = self.current_frame
