@@ -6,7 +6,7 @@ from .game_objects import *
 import csv
 import math
 import os
-#from PIL import Image
+from PIL import Image
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 
 
