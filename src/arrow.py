@@ -4,7 +4,7 @@ sys.path.append('..')
 from league import *
 
 class Arrow(Character):
-    def __init__(self, image, time, direction, engine, z, x, y):
+    def __init__(self, image, direction, engine, z, x, y):
         super().__init__(z, x, y)
         self.delta = 800
 
@@ -14,20 +14,24 @@ class Arrow(Character):
 
         self.engine = engine
 
-        #self.update_direction_func = None
-
-        #if (direction is State.North):
-        #self.update_direction_func = self.move_up(time)
-        #if (direction is State.South):
-        #    self.update_direction_func = self.move_down
-        #if (direction is State.East):
-        #    self.update_direction_func = self.move_right
-        #if (direction is State.West):
-        #    self.update_direction_func = self.move_left
-
+        self.update_direction_func = self.move_down
 
         self.image = pygame.transform.scale(image, (31,5))
         self.rect = self.image.get_rect()
+
+
+        if (direction is Direction.NORTH):
+            self.update_direction_func = self.move_up
+            self.rot_center(90)
+        if (direction is Direction.SOUTH):
+            self.update_direction_func = self.move_down
+            self.rot_center(-90)
+        if (direction is Direction.EAST):
+            self.update_direction_func = self.move_right
+        if (direction is Direction.WEST):
+            self.update_direction_func = self.move_left
+            self.rot_center(180)
+ 
         # How big the world is, so we can check for boundries
         self.world_size = (Settings.width, Settings.height)
         # What sprites am I not allowd to cross?
@@ -115,7 +119,9 @@ class Arrow(Character):
 
 
     def update(self, time):
-        self.move_right(time)
+        #self.move_right(time)
+
+        self.update_direction_func(time)
         self.rect.x = self.x
         self.rect.y = self.y
         self.collisions = []
@@ -124,3 +130,9 @@ class Arrow(Character):
             self.collider.rect.y = sprite.y
             if pygame.sprite.collide_rect(self, self.collider):
                 self.collisions.append(sprite)
+
+    #https://stackoverflow.com/questions/21080790/pygame-and-rotation-of-a-sprite
+    #   by jonsharpe
+    def rot_center(self, angle):
+        self.image = pygame.transform.rotate(self.image, angle)
+        self.rect = self.image.get_rect(center=self.rect.center)

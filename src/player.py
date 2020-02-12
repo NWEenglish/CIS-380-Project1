@@ -207,7 +207,7 @@ class Player(Character):
             self.current_frame = (self.current_frame + 1) % (self.ranged_length)
 
             if (self.current_frame is 9):
-                arrow = Arrow(self.arrow_image, time, self.direction, self.engine, 10,self.x,self.y)
+                arrow = Arrow(self.arrow_image, self.direction, self.engine, 10,self.x,self.y)
                 print('length of engine objects is: ')
                 print(len(self.engine.objects))
                 print()
