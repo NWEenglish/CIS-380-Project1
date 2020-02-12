@@ -4,9 +4,9 @@ sys.path.append('..')
 from league import *
 
 class Arrow(Character):
-    def __init__(self, time, direction, engine, z=0, x=0, y=0):
+    def __init__(self, time, direction, engine, z, x, y):
         super().__init__(z, x, y)
-        self.delta = 100
+        self.delta = 800
 
         self.x = x
         self.y = y
@@ -48,6 +48,7 @@ class Arrow(Character):
 
         self.engine.objects.append(self)
         self.engine.drawables.add(self)
+        self.update(0)
 
     def move_left(self, time):
         self.collisions = []
@@ -112,8 +113,9 @@ class Arrow(Character):
 
 
     def update(self, time):
-        #self.rect.x = self.x
-        #self.rect.y = self.y
+        self.move_right(time)
+        self.rect.x = self.x
+        self.rect.y = self.y
         self.collisions = []
         for sprite in self.blocks:
             self.collider.rect.x= sprite.x

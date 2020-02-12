@@ -204,7 +204,7 @@ class Player(Character):
             self.current_frame = (self.current_frame + 1) % (self.ranged_length)
 
             if (self.current_frame is 10):
-                arrow = Arrow(time, self.direction, self.engine, self.x,self.y)
+                arrow = Arrow(time, self.direction, self.engine, 10,self.x,self.y)
                 print('length of engine objects is: ')
                 print(len(self.engine.objects))
                 print()
@@ -217,6 +217,9 @@ class Player(Character):
         self.current_sprite_set = self.state_sprites[self.state.value][self.direction.value]
         self.image = self.current_sprite_set[self.current_frame].image.convert_alpha()
         self.image = pygame.transform.scale(self.image, (64, 64))
+
+        #divide fps by delta and state to step to next frame
+
         for sprite in self.blocks:
             self.collider.rect.x= sprite.x
             self.collider.rect.y = sprite.y
