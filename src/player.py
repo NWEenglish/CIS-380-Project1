@@ -42,6 +42,8 @@ class Player(Character):
         # The objects melee weapon
         self.sword = Melee_Weapon(3,0,0, engine, self)
 
+        self.arrow_image = pygame.image.load('../assets/arrow.png').convert_alpha()
+
         ## Walk sprites
         self.walk_length = 9
         raw_walk_sprites = Spritesheet('../assets/plate_walk.png', 64, self.walk_length)
@@ -196,7 +198,7 @@ class Player(Character):
             self.sword.current_frame = self.current_frame
             self.sword.attack_update()
         else:
-            self.engine.objects.append(self.sword)
+            #self.engine.objects.append(self.sword)
             self.engine.drawables.add(self.sword)
         pass
 
@@ -204,8 +206,8 @@ class Player(Character):
         if not self.setState(State.RANGE):
             self.current_frame = (self.current_frame + 1) % (self.ranged_length)
 
-            if (self.current_frame is 10):
-                arrow = Arrow(time, self.direction, self.engine, 10,self.x,self.y)
+            if (self.current_frame is 9):
+                arrow = Arrow(self.arrow_image, time, self.direction, self.engine, 10,self.x,self.y)
                 print('length of engine objects is: ')
                 print(len(self.engine.objects))
                 print()
@@ -235,7 +237,7 @@ class Player(Character):
 
     def setState(self, state):
         if (state is not State.MELEE and self.state is State.MELEE):
-            self.engine.objects.remove(self.sword)
+            #self.engine.objects.remove(self.sword)
             self.engine.drawables.remove(self.sword)
 
         if (self.state is not state):

@@ -4,7 +4,7 @@ sys.path.append('..')
 from league import *
 
 class Arrow(Character):
-    def __init__(self, time, direction, engine, z, x, y):
+    def __init__(self, image, time, direction, engine, z, x, y):
         super().__init__(z, x, y)
         self.delta = 800
 
@@ -26,8 +26,7 @@ class Arrow(Character):
         #    self.update_direction_func = self.move_left
 
 
-        self.image = pygame.image.load('../assets/arrow.png').convert_alpha()
-        self.image = pygame.transform.scale(self.image, (31,5))
+        self.image = pygame.transform.scale(image, (31,5))
         self.rect = self.image.get_rect()
         # How big the world is, so we can check for boundries
         self.world_size = (Settings.width, Settings.height)
@@ -49,6 +48,9 @@ class Arrow(Character):
         self.engine.objects.append(self)
         self.engine.drawables.add(self)
         self.update(0)
+    
+    def get_instance():
+        pass
 
     def move_left(self, time):
         self.collisions = []
