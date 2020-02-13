@@ -211,6 +211,9 @@ class Player(Character):
                 print('length of engine objects is: ')
                 print(len(self.engine.objects))
                 print()
+
+            if (self.current_frame is 12):
+                self.current_frame = 3
         pass
 
     def update(self, time):
