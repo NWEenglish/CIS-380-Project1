@@ -18,7 +18,7 @@ def main():
     engine = league.Engine("Gricelda")
     engine.init_pygame()
 
-    user = Player(engine,3,10)
+    user = Player(engine,5,10)
     engine.objects.append(user)
 
     screen = Screen(user, engine)
