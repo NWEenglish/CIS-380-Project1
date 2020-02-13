@@ -40,7 +40,7 @@ class Player(Character):
         self.current_frame = 0
 
         # The objects melee weapon
-        self.sword = Melee_Weapon(3,0,0, engine, self)
+        self.sword = Melee_Weapon(6,0,0, engine, self)
 
         self.arrow_image = pygame.image.load('../assets/arrow.png').convert_alpha()
 
