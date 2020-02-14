@@ -304,6 +304,7 @@ class Screen(DUGameObject):
 
     def set_screen_lost_woods_entrance(self):
         """Creates 'lost wood entrance screen"""
+        # self.terrain = league.Tilemap('../assets/testMap.png', self.sprites_base, layer=1)
         self.terrain = league.Tilemap('../assets/lost_woods_terrain.lvl', self.sprites_base, layer=1)
         self.details = league.Tilemap('../assets/lost_woods_entrance_details.lvl', self.sprites_base, layer=2)
         self.drawables.append(self.terrain.passable.sprites())
@@ -323,7 +324,7 @@ class Screen(DUGameObject):
         self.use_door(50, 304, self.set_screen_lost_woods_2)
 
     def set_screen_lost_woods_2(self):
-        self.terrain = league.Tilemap('assets/lost_woods_terrain.lvl', self.sprites_base, layer=1)
+        self.terrain = league.Tilemap('../assets/lost_woods_terrain.lvl', self.sprites_base, layer=1)
         self.details = league.Tilemap('../assets/lost_woods_summer_details.lvl', self.sprites_base, layer=2)
         self.drawables.append(self.terrain.passable.sprites())
         self.drawables.append(self.details.passable.sprites())

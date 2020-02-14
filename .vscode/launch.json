@@ -11,13 +11,6 @@
       "program": "${workspaceFolder}/src/Gricelda.py",
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src"
-    },
-    {
-      "name": "Python: Current File",
-      "type": "python",
-      "request": "launch",
-      "program": "${file}",
-      "console": "integratedTerminal"
     }
   ]
 }
