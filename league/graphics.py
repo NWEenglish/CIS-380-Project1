@@ -198,8 +198,8 @@ class Spritesheet:
         y = self.tile_size * (num // self.per_row)
         x = self.tile_size * (num % self.per_row)
         sprite = Drawable()
-        sprite.image = pygame.Surface(
-            (self.tile_size, self.tile_size)).convert_alpha()
+        #Allows sprites loaded from a spritesheet to have an alpha-channel
+        sprite.image = pygame.Surface((self.tile_size, self.tile_size), pygame.SRCALPHA)
         sprite.image.blit(self.sheet, (0, 0), (x, y, x +
                                                self.tile_size, y + self.tile_size))
         return sprite

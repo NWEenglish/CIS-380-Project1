@@ -2,10 +2,11 @@
 
 import pygame
 import sys
-sys.path.append('..')
-import league
 from player import Player
 from screen import Screen
+sys.path.append('..')
+import league
+
 
 def main():
     """Just used to set up the engine and screen"""
@@ -17,7 +18,7 @@ def main():
     engine = league.Engine("Gricelda")
     engine.init_pygame()
 
-    user = Player(10)
+    user = Player(engine,5,10)
     engine.objects.append(user)
 
     screen = Screen(user, engine)
@@ -30,6 +31,9 @@ def main():
     engine.key_events[pygame.K_d] = user.move_right
     engine.key_events[pygame.K_w] = user.move_up
     engine.key_events[pygame.K_s] = user.move_down
+    engine.key_events[pygame.K_s] = user.move_down
+    engine.key_events[pygame.K_o] = user.melee
+    engine.key_events[pygame.K_p] = user.range
     engine.events[pygame.QUIT] = engine.stop
     engine.run()
 
