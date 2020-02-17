@@ -44,6 +44,11 @@ class Player(Character):
 
         self.arrow_image = pygame.image.load('../assets/arrow.png').convert_alpha()
 
+        # Contains list of fired arrows in this scene
+        self.arrows = []
+
+        self.state_time = 0
+
         ## Walk sprites
         self.walk_length = 9
         raw_walk_sprites = Spritesheet('../assets/plate_walk.png', 64, self.walk_length)
@@ -208,15 +213,15 @@ class Player(Character):
 
             if (self.current_frame is 9):
                 arrow = Arrow(self.arrow_image, self.direction, self.engine, 3,self.x + 31,self.y + 31)
-                print('length of engine objects is: ')
-                print(len(self.engine.objects))
-                print()
+                self.arrows.append(arrow)
 
             if (self.current_frame is 12):
                 self.current_frame = 3
         pass
 
     def update(self, time):
+        self.state_time = self.state_time + 1
+        self.reset_frame()
         self.rect.x = self.x
         self.rect.y = self.y
         self.collisions = []
@@ -231,6 +236,13 @@ class Player(Character):
             self.collider.rect.y = sprite.y
             if pygame.sprite.collide_rect(self, self.collider):
                 self.collisions.append(sprite)
+    def reset_frame(self):
+        #time = pygame.time.get_ticks()
+        if (self.state_time > 4):       
+            self.current_frame = 0
+            if (self.state == State.MELEE):
+                self.sword.current_frame = 0
+                self.sword.attack_update()
 
     def ouch(self):
         now = pygame.time.get_ticks()
@@ -239,6 +251,7 @@ class Player(Character):
             self.last_hit = now
 
     def setState(self, state):
+        self.state_time = 0
         if (state is not State.MELEE and self.state is State.MELEE):
             #self.engine.objects.remove(self.sword)
             self.engine.drawables.remove(self.sword)
