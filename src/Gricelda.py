@@ -4,6 +4,7 @@ import pygame
 import sys
 from player import Player
 from screen import Screen
+from enemy import Enemy
 sys.path.append('..')
 import league
 
@@ -21,7 +22,19 @@ def main():
     user = Player(engine,5,10)
     engine.objects.append(user)
 
-    screen = Screen(user, engine)
+    # Add an enemy
+    enemy = Enemy(engine, "../assets/imp - walk - vanilla.png", "../assets/imp - attack - vanilla.png", 5, 10)
+    engine.objects.append(enemy)
+    # screen = Screen(enemy, engine)
+    # engine.objects.append(screen)
+
+    # itemList = [user]
+    # itemList.append(enemy)
+
+    # Make enemy into enemyList
+    screen = Screen(user, enemy, engine)
+
+    # screen = Screen(user, engine)
     "Screen is passed the player to allow them to be changed by the world"
     "   and engine to allow all world updates"
     engine.objects.append(screen)

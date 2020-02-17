@@ -10,7 +10,7 @@ class Screen(DUGameObject):
     """Creates all the world objects and passes them along with any collision methods
     to main to be drawn"""
 
-    def __init__(self, user, g_engine):
+    def __init__(self, user, enemy, g_engine):
         """Calls the first game screen and creates data structures to pass to update.
         user is the player class.
         g_engine is the league engine.
@@ -37,8 +37,17 @@ class Screen(DUGameObject):
         set_screen_beach loads the first screen"""
 
         self.engine = g_engine
+
         self.user = user
+        self.enemy = enemy
+        self.engine.drawables.add(self.enemy)
         self.engine.drawables.add(self.user)
+
+        # self.user = items.pop(0)
+        # self.engine.drawables.add(self.user)
+        #
+        # for i in items:
+        #     self.engine.drawables.add(i)
 
         self.door_x = 365
         self.door_y = 425
@@ -65,6 +74,7 @@ class Screen(DUGameObject):
         self.details = league.Tilemap('../assets/blank.lvl', self.sprites_utu, layer = 3)
         self.world_size = (self.terrain.wide*league.Settings.tile_size, self.terrain.high * league.Settings.tile_size)
         self.user.world_size = self.world_size
+        self.enemy.world_size = self.world_size
         self.set_screen_lost_woods_entrance()
 
     def make_north_door(self, next_screen):
@@ -150,6 +160,12 @@ class Screen(DUGameObject):
             self.user.blocks.add(self.terrain.impassable)
             self.user.blocks.add(self.details.impassable)
             self.user.blocks.add(self.blocking_object)
+
+            # self.enemy.blocks.empty()
+            # self.enemy.blocks.add(self.terrain.impassable)
+            # self.enemy.blocks.add(self.details.impassable)
+            # self.enemy.blocks.add(self.blocking_object)
+
             self.last_blocking_objects = self.blocking_object.copy()
             self.blocking_object.empty()
 
