@@ -100,7 +100,6 @@ class Tilemap:
             # This is where custom loader coad goes
             mapImage = pygame.image.load(self.path)
             pixels = pygame.PixelArray(mapImage)
-            print(pixels)
             self.wide, self.high = pixels.shape
             tempWorld = [[None]*self.wide for _ in range(self.high)]
             for i in range(0, self.high):
@@ -114,7 +113,6 @@ class Tilemap:
             self.world = tempWorld
 
         else:
-            print(self.path)
             with open(self.path + "..", 'r') as f:
                 reader = csv.reader(f)
                 contents = list(reader)
