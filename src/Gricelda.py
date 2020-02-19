@@ -26,6 +26,10 @@ def main():
     "   and engine to allow all world updates"
     engine.objects.append(screen)
 
+    pygame.mixer.init()
+    background_track = pygame.mixer.Sound("../assets/track6.ogg")
+    background_track.play(-1)
+
     #pygame.time.set_timer(pygame.USEREVENT + 1, 1000 // league.Settings.gameTimeFactor)
     engine.key_events[pygame.K_a] = user.move_left
     engine.key_events[pygame.K_d] = user.move_right

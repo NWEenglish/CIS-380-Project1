@@ -207,12 +207,20 @@ class Player(Character):
             self.engine.drawables.add(self.sword)
         pass
 
+        if (self.current_frame is 5):
+            arrow_noise = pygame.mixer.Sound("../assets/attack_noise.wav")
+            arrow_noise.play()
+
+
     def range(self, time):
         if not self.setState(State.RANGE):
             self.current_frame = (self.current_frame + 1) % (self.ranged_length)
 
             if (self.current_frame is 9):
                 arrow = Arrow(self.arrow_image, self.direction, self.engine, 3,self.x + 31,self.y + 31)
+                arrow_noise = pygame.mixer.Sound("../assets/attack_noise.wav")
+                arrow_noise.play()
+
                 self.arrows.append(arrow)
 
             if (self.current_frame is 12):
