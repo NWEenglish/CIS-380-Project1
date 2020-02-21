@@ -176,6 +176,28 @@ class Enemy(Character):
                 self.direction = Direction.SOUTH
                 self.current_frame = 0
 
+    def move_idle(self, time):
+        if not self.setState(State.MOVE):
+            if (self.direction == Direction.SOUTH):
+                self.current_frame = self.current_frame
+                self.collisions = []
+                amount = 0
+                try:
+                    if self.y + amount > self.world_size[1] - Settings.tile_size:
+                        raise OffScreenBottomException
+                    else:
+                        self.y = self.y + amount
+                        self.update(0)
+                        if len(self.collisions) != 0:
+                            self.y = self.y - amount
+                            self.update(0)
+                            self.collisions = []
+                except:
+                    pass
+            else:
+                self.direction = Direction.SOUTH
+                self.current_frame = 0
+
     # def attack(self, time):
     #     self.sword.x = self.x - 64
     #     self.sword.y = self.y - 64
