@@ -43,8 +43,11 @@ def main():
     "   and engine to allow all world updates"
     engine.objects.append(screen)
 
-    # Moves the enemy
-    # enemy.move_right
+    engine.drawables.remove(user)
+    engine.drawables.remove(enemy)
+    showTitleScreen(screen, engine)
+    engine.drawables.add(user)
+    engine.drawables.add(enemy)
 
     #pygame.time.set_timer(pygame.USEREVENT + 1, 1000 // league.Settings.gameTimeFactor)
     engine.key_events[pygame.K_a] = user.move_left
@@ -71,7 +74,6 @@ def main():
     engine.events[pygame.QUIT] = engine.stop
 
     # engine.run()
-
 
     # Update enemy location
     while True:
@@ -142,6 +144,34 @@ def main():
 
         # engine.run()
         engine.stop(pygame.time)
+
+def showTitleScreen(screen, engine):
+    """
+    This method is adapted from: http://inventwithpython.com/pygame/chapter6.html
+    We just wanted a 'cute' start screen for our game since we needed another feature
+    """
+    titleScreenFont = pygame.font.SysFont("comicsansms", 120)
+    titleNameSurface = titleScreenFont.render("Gricelda", True, (255, 215, 0))
+    titleScreenFont = pygame.font.SysFont("comicsansms", 25)
+    titlePressStartSurface = titleScreenFont.render("Press any key to continue", True, (255, 215, 0))
+    screen.drawables.append(titleNameSurface)
+    screen.drawables.append(titlePressStartSurface)
+    inTitleScreen = True
+    while inTitleScreen: 
+        engine.screen.fill((0, 0, 0))
+        engine.screen.blit(titleNameSurface, (150, 80))
+        engine.screen.blit(titlePressStartSurface, (220, 400))
+        engine.drawables.draw(engine.screen)
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                inTitleScreen = False
+    screen.drawables.remove(titleNameSurface)
+    screen.drawables.remove(titlePressStartSurface)
+
 
 
 if __name__ == '__main__':
