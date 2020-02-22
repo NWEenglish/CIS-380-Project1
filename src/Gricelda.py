@@ -5,7 +5,7 @@ import sys
 import math
 from player import Player
 from screen import Screen
-from enemy import Enemy
+from Enemy import Enemy
 sys.path.append('..')
 import league
 
@@ -86,7 +86,7 @@ def main():
     m_e_l = False
 
     # Update enemy location
-    while True:
+    while engine.running:
 
 
         # engine.stop(pygame.time)
@@ -113,7 +113,7 @@ def main():
                     m_e_r = False
                     m_e_l = False
 
-                    print("move down")
+                    # print("move down")
 
                 # Move up
                 elif user.y < enemy.y and not m_e_u:
@@ -129,7 +129,7 @@ def main():
                     m_e_r = False
                     m_e_l = False
 
-                    print("move up")
+                    # print("move up")
 
             else: #user.x < enemy.x - 200 or user.x > enemy.x + 200:
 
@@ -147,7 +147,7 @@ def main():
                     m_e_r = False
                     m_e_l = True
 
-                    print("move left")
+                    # print("move left")
 
                 # If enemy is to the right of user, move left
                 elif enemy.x < user.x < enemy.x + 200 and not m_e_r:
@@ -163,7 +163,7 @@ def main():
                     m_e_r = True
                     m_e_l = False
 
-                    print("move right")
+                    # print("move right")
 
             # Idle
             # elif user.y - 20 <= enemy.y <= user.y + 20:
@@ -204,6 +204,7 @@ def showTitleScreen(screen, engine):
                 inTitleScreen = False
     screen.drawables.remove(titleNameSurface)
     screen.drawables.remove(titlePressStartSurface)
+    engine.running = True
 
 
 

@@ -53,7 +53,7 @@ class Arrow(Character):
         self.engine.drawables.add(self)
         self.update(0)
     
-    def get_instance():
+    def get_instance(self):
         pass
 
     def move_left(self, time):
@@ -118,7 +118,7 @@ class Arrow(Character):
             pass
 
 
-    def update(self, time):
+    def update(self, time, sprite = None):
         #self.move_right(time)
 
         self.update_direction_func(time)
@@ -128,11 +128,16 @@ class Arrow(Character):
         for sprite in self.blocks:
             self.collider.rect.x= sprite.x
             self.collider.rect.y = sprite.y
-            if pygame.sprite.collide_rect(self, self.collider):
+            if pygame.sprite.collide_rect(self.collider, self.sprite):
+                print("made it here!")
                 self.collisions.append(sprite)
+                print(self.collisions)
 
     #https://stackoverflow.com/questions/21080790/pygame-and-rotation-of-a-sprite
     #   by jonsharpe
     def rot_center(self, angle):
         self.image = pygame.transform.rotate(self.image, angle)
         self.rect = self.image.get_rect(center=self.rect.center)
+
+    def collisions(self):
+        print("Arrow Collide")

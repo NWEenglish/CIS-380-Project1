@@ -244,6 +244,7 @@ class Player(Character):
             self.collider.rect.y = sprite.y
             if pygame.sprite.collide_rect(self, self.collider):
                 self.collisions.append(sprite)
+                print(self.collisions)
     def reset_frame(self):
         #time = pygame.time.get_ticks()
         if (self.state_time > 4):       
@@ -283,3 +284,5 @@ class Player(Character):
         self.x = 200
         self.y = 200
 
+    def collisions(self):
+        print("Player Collide")

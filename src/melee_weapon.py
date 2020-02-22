@@ -72,6 +72,7 @@ class Melee_Weapon(Character):
             self.collider.rect.y = sprite.y
             if pygame.sprite.collide_rect(self, self.collider):
                 self.collisions.append(sprite)
+                print(self.collisions)
 
     # Helper function to get a specific row of a spritesheet (offset)
     def get_sprite_set(self, sprite_source, tile_size, per_row, offset=0):
@@ -81,3 +82,6 @@ class Melee_Weapon(Character):
             rtn.append(sprite_source.sprites[offset*per_row + i])
 
         return rtn  
+    
+    def collisions(self):
+        print("Sword collide")
