@@ -43,6 +43,10 @@ def main():
     "   and engine to allow all world updates"
     engine.objects.append(screen)
 
+    pygame.mixer.init()
+    background_track = pygame.mixer.Sound("../assets/track6.ogg")
+    background_track.play(-1)
+    
     engine.drawables.remove(user)
     engine.drawables.remove(enemy)
     showTitleScreen(screen, engine)
