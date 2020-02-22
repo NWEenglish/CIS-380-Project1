@@ -68,38 +68,41 @@ class Engine:
     def run(self):
         """The main game loop.  As close to our book code as possible."""
         self.running = True
-        while self.running:
-            # The time since the last check
-            now = pygame.time.get_ticks()
-            self.real_delta_time = now - self.last_checked_time
-            self.last_checked_time = now
-            self.game_delta_time = self.real_delta_time * (0.001 * Settings.gameTimeFactor)
+        # while self.running:
 
-            # Wipe screen
-            self.screen.fill(Settings.fill_color)
-            
-            # Process inputs
-            self.handle_inputs()
+        """We remove the while loop so that we can update the enemy locations. """
 
-            # Update game world
-            # Each object must have an update(time) method
-            self.check_collisions()
-            for o in self.objects:
-                o.update(self.game_delta_time)
+        # The time since the last check
+        now = pygame.time.get_ticks()
+        self.real_delta_time = now - self.last_checked_time
+        self.last_checked_time = now
+        self.game_delta_time = self.real_delta_time * (0.001 * Settings.gameTimeFactor)
 
-            # Generate outputs
-            #d.update()
-            self.drawables.draw(self.screen)
+        # Wipe screen
+        self.screen.fill(Settings.fill_color)
 
-            # Show statistics?
-            if self.visible_statistics:
-                self.show_statistics()
-            
-            # Could keep track of rectangles and update here, but eh.
-            pygame.display.flip()
+        # Process inputs
+        self.handle_inputs()
 
-            # Frame limiting code
-            self.clock.tick(Settings.fps)
+        # Update game world
+        # Each object must have an update(time) method
+        self.check_collisions()
+        for o in self.objects:
+            o.update(self.game_delta_time)
+
+        # Generate outputs
+        #d.update()
+        self.drawables.draw(self.screen)
+
+        # Show statistics?
+        if self.visible_statistics:
+            self.show_statistics()
+
+        # Could keep track of rectangles and update here, but eh.
+        pygame.display.flip()
+
+        # Frame limiting code
+        self.clock.tick(Settings.fps)
 
     # Here we will iterate through the possible collisions.  If sprite
     # i collides with the sprite in the tuple, call the function in the
@@ -142,5 +145,11 @@ class Engine:
             # Check if these key_event keys were pressed
             if event.type == pygame.KEYDOWN:
                 if event.key in self.key_events.keys():
-                    self.key_events[event.key](self.game_delta_time) 
+                    self.key_events[event.key](self.game_delta_time)
 
+            # for x in range(5):
+            #     if event.type == pygame.USEREVENT + x:
+            #         self.events[event.type](self.game_delta_time)
+            #
+            # if event.type == pygame.QUIT:
+            #     self.events[event.type](self.game_delta_time)
