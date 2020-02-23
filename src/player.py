@@ -6,6 +6,7 @@ from melee_weapon import Melee_Weapon
 from arrow import Arrow
 sys.path.append('..')
 from league import *
+import os
 
 class Player(Character):
     """This is a sample class for a player object.  A player
@@ -48,6 +49,14 @@ class Player(Character):
         self.arrows = []
 
         self.state_time = 0
+
+        engine.key_events[pygame.K_a] = self.move_left
+        engine.key_events[pygame.K_d] = self.move_right
+        engine.key_events[pygame.K_w] = self.move_up
+        engine.key_events[pygame.K_s] = self.move_down
+        engine.key_events[pygame.K_s] = self.move_down
+        engine.key_events[pygame.K_o] = self.melee
+        engine.key_events[pygame.K_p] = self.range
 
         ## Walk sprites
         self.walk_length = 9
@@ -210,6 +219,7 @@ class Player(Character):
         if (self.current_frame is 5):
             arrow_noise = pygame.mixer.Sound("../assets/attack_noise.wav")
             arrow_noise.play()
+            pass
 
 
     def range(self, time):
@@ -240,7 +250,7 @@ class Player(Character):
         #divide fps by delta and state to step to next frame
 
         for sprite in self.blocks:
-            self.collider.rect.x= sprite.x
+            self.collider.rect.x = sprite.x
             self.collider.rect.y = sprite.y
             if pygame.sprite.collide_rect(self, self.collider):
                 self.collisions.append(sprite)

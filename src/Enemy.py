@@ -12,8 +12,25 @@ class Enemy(Character):
     moving, throwing/shooting, collisions, etc.  It was hastily
     written as a demo but should direction.
     """
-    def __init__(self, engine, walk_img, attack_img, health, z=0, x=0, y=0):
+    def __init__(self, engine, user, walk_img, attack_img, health, z=0, x=0, y=0):
         super().__init__(z, x, y)
+
+        self.user = user
+        self.m_e_d = False
+        self.m_e_u = False
+        self.m_e_r = False
+        self.m_e_l = False
+        self.move_enemy_right = pygame.USEREVENT + 1
+        self.move_enemy_left = pygame.USEREVENT + 2
+        self.move_enemy_up = pygame.USEREVENT + 3
+        self.move_enemy_down = pygame.USEREVENT + 4
+        self.move_enemy_idle = pygame.USEREVENT + 5
+
+        engine.events[self.move_enemy_right] = self.move_right
+        engine.events[self.move_enemy_left] = self.move_left
+        engine.events[self.move_enemy_up] = self.move_up
+        engine.events[self.move_enemy_down] = self.move_down
+        engine.events[self.move_enemy_idle] = self.move_idle
 
         # Reference to the engine
         self.engine = engine
@@ -218,13 +235,46 @@ class Enemy(Character):
     #
     #         if (self.current_frame is 9):
     #             arrow = Arrow(self.arrow_image, self.direction, self.engine, 3,self.x + 31,self.y + 31)
-    #             print('length of engine objects is: ')
+    #             ooo('length of engine objects is: ')
     #             print(len(self.engine.objects))
     #             print()
     #
     #         if (self.current_frame is 12):
     #             self.current_frame = 3
     #     pass
+
+    def distance(self, x1, y1, x2, y2):
+        return math.sqrt(abs(math.pow(y2 - y1, 2) + math.pow(x2 - x1, 2)))
+
+    def knockback(self):
+        if self.m_e_d:
+            self.y = self.y - 50
+            self.update(0)
+            if len(self.collisions) != 0:
+                self.y = self.y + 50
+                self.update(0)
+                self.collisions.clear()
+        if self.m_e_u:
+            self.y = self.y + 50
+            self.update(0)
+            if len(self.collisions) != 0:
+                self.y = self.y - 50
+                self.update(0)
+                self.collisions.clear()
+        if self.m_e_r:
+            self.x = self.x - 50
+            self.update(0)
+            if len(self.collisions) != 0:
+                self.x = self.x + 50
+                self.update(0)
+                self.collisions.clear()
+        if self.m_e_l:
+            self.x = self.x + 50
+            self.update(0)
+            if len(self.collisions) != 0:
+                self.x = self.x - 50
+                self.update(0)
+                self.collisions.clear()
 
     def update(self, time):
         self.rect.x = self.x
@@ -237,10 +287,94 @@ class Enemy(Character):
         #divide fps by delta and state to step to next frame
 
         for sprite in self.blocks:
-            self.collider.rect.x= sprite.x
+            self.collider.rect.x = sprite.x
             self.collider.rect.y = sprite.y
             if pygame.sprite.collide_rect(self, self.collider):
                 self.collisions.append(sprite)
+
+        if self.distance(self.x, self.y, self.user.x, self.user.y) < 2000:
+            #engine.stop(pygame.time)
+
+            # Move along the y-axis
+            if self.x - 20 <= self.user.x <= self.x + 20:
+
+                # Move down
+                if self.y < self.user.y and not self.m_e_d:
+                    pygame.time.set_timer(self.move_enemy_up, 0)
+                    pygame.time.set_timer(self.move_enemy_right, 0)
+                    pygame.time.set_timer(self.move_enemy_left, 0)
+                    pygame.time.set_timer(self.move_enemy_idle, 0)
+
+                    pygame.time.set_timer(self.move_enemy_down, 100)
+
+                    self.m_e_d = True
+                    self.m_e_u = False
+                    self.m_e_r = False
+                    self.m_e_l = False
+
+                    #print("move down")
+
+                # Move up
+                elif self.user.y < self.y and not self.m_e_u:
+                    pygame.time.set_timer(self.move_enemy_down, 0)
+                    pygame.time.set_timer(self.move_enemy_right, 0)
+                    pygame.time.set_timer(self.move_enemy_left, 0)
+                    pygame.time.set_timer(self.move_enemy_idle, 0)
+
+                    pygame.time.set_timer(self.move_enemy_up, 100)
+
+                    self.m_e_d = False
+                    self.m_e_u = True
+                    self.m_e_r = False
+                    self.m_e_l = False
+
+                    #print("move up")
+
+            else: #user.x < enemy.x - 200 or user.x > enemy.x + 200:
+
+                # If enemy is to the left of user, move right
+                if self.x - 200 < self.user.x < self.x and not self.m_e_l:
+                    pygame.time.set_timer(self.move_enemy_up, 0)
+                    pygame.time.set_timer(self.move_enemy_down, 0)
+                    pygame.time.set_timer(self.move_enemy_right, 0)
+                    pygame.time.set_timer(self.move_enemy_idle, 0)
+
+                    pygame.time.set_timer(self.move_enemy_left, 100)
+
+                    self.m_e_d = False
+                    self.m_e_u = False
+                    self.m_e_r = False
+                    self.m_e_l = True
+
+                    #print("move left")
+
+                # If enemy is to the right of user, move left
+                elif self.x < self.user.x < self.x + 200 and not self.m_e_r:
+                    pygame.time.set_timer(self.move_enemy_up, 0)
+                    pygame.time.set_timer(self.move_enemy_down, 0)
+                    pygame.time.set_timer(self.move_enemy_left, 0)
+                    pygame.time.set_timer(self.move_enemy_idle, 0)
+
+                    pygame.time.set_timer(self.move_enemy_right, 100)
+
+                    self.m_e_d = False
+                    self.m_e_u = False
+                    self.m_e_r = True
+                    self.m_e_l = False
+
+                    #print("move right")
+
+            # Idle
+            # elif user.y - 20 <= enemy.y <= user.y + 20:
+            #     pygame.time.set_timer(move_enemy_down, 0)
+            #     pygame.time.set_timer(move_enemy_right, 0)
+            #     pygame.time.set_timer(move_enemy_left, 0)
+            #     pygame.time.set_timer(move_enemy_up, 0)
+            #
+            #     pygame.time.set_timer(move_enemy_idle, 100)
+
+        #engine.run()
+        # engine.stop(pygame.time)
 
     def ouch(self):
         now = pygame.time.get_ticks()
