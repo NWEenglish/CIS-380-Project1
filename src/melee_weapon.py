@@ -50,17 +50,16 @@ class Melee_Weapon(Character):
         # For performance reasons I created this sprite so we
         # don't have to create more memory each iteration of
         # collision detection.
-        self.collider = Drawable()
-        self.collider.image = pygame.Surface([Settings.tile_size, Settings.tile_size])
-        self.collider.rect = self.collider.image.get_rect()
-        pass
+        # self.collider = Drawable()
+        # self.collider.image = pygame.Surface([Settings.tile_size, Settings.tile_size])
+        # self.collider.rect = self.collider.image.get_rect()
+        self.engine.collisions[self] = (self.engine.objects[1], self.enemy_take_damage)
+
     pass
 
     def update(self, time):
         pass
     def attack_update(self):
-
-
         self.rect.x = self.x
         self.rect.y = self.y
         self.collisions = []
@@ -82,6 +81,7 @@ class Melee_Weapon(Character):
             rtn.append(sprite_source.sprites[offset*per_row + i])
 
         return rtn  
-    
-    def collisions(self):
-        print("Sword collide")
+
+    def enemy_take_damage(self):
+        print("enemy took damage")
+        self.engine.objects[1].take_damage()

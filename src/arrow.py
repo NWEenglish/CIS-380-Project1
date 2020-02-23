@@ -45,13 +45,16 @@ class Arrow(Character):
         # For performance reasons I created this sprite so we
         # don't have to create more memory each iteration of
         # collision detection.
-        self.collider = Drawable()
-        self.collider.image = pygame.Surface([Settings.tile_size, Settings.tile_size])
-        self.collider.rect = self.collider.image.get_rect()
+        # self.collider = Drawable()
+        # self.collider.image = pygame.Surface([Settings.tile_size, Settings.tile_size])
+        # self.collider.rect = self.collider.image.get_rect()
 
         self.engine.objects.append(self)
         self.engine.drawables.add(self)
         self.update(0)
+        
+        # self.collisions.append((self.engine.objects[1].image, self.enemy_take_damage))
+        self.engine.collisions[self] = (self.engine.objects[1], self.enemy_take_damage)
     
     def get_instance(self):
         pass
@@ -139,5 +142,6 @@ class Arrow(Character):
         self.image = pygame.transform.rotate(self.image, angle)
         self.rect = self.image.get_rect(center=self.rect.center)
 
-    def collisions(self):
-        print("Arrow Collide")
+    def enemy_take_damage(self):
+        print("enemy took damage")
+        self.engine.objects[1].take_damage()

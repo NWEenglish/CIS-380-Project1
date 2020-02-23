@@ -61,7 +61,8 @@ def main():
     engine.key_events[pygame.K_s] = user.move_down
     engine.key_events[pygame.K_o] = user.melee
     engine.key_events[pygame.K_p] = user.range
-
+    engine.key_events[pygame.K_v] = engine.debug
+    
     # Used for enemy events
     move_enemy_right = pygame.USEREVENT + 1
     move_enemy_left = pygame.USEREVENT + 2

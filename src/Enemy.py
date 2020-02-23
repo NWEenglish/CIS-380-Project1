@@ -272,6 +272,10 @@ class Enemy(Character):
         self.x = 200
         self.y = 200
 
+    def take_damage(self):
+        self.health = self.health - 10
+        print(self.health)
+
 
 
 

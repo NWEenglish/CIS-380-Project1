@@ -109,7 +109,9 @@ class Engine:
     # tuple.
     def check_collisions(self):
         for i in self.collisions.keys():
+            # print(self.collisions[i][0])
             if pygame.sprite.collide_rect(i, self.collisions[i][0]):
+                print("Collide")
                 self.collisions[i][1]()
 
     def add_group(self, group):
@@ -153,3 +155,6 @@ class Engine:
             #
             # if event.type == pygame.QUIT:
             #     self.events[event.type](self.game_delta_time)
+
+    def debug(self, time):
+        print("HI")
