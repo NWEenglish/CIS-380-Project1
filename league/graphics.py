@@ -6,6 +6,7 @@ from .game_objects import *
 import csv
 import math
 import os
+from PIL import Image
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 
 
@@ -98,31 +99,23 @@ class Tilemap:
         """
         if self.path.endswith(".png"):
             # This is where custom loader coad goes
-            mapImage = pygame.image.load(self.path)
-            pixels = pygame.PixelArray(mapImage)
-            self.wide, self.high = pixels.shape
-            tempWorld = [[None]*self.wide for _ in range(self.high)]
-            for i in range(0, self.high):
-                for j in range(0, self.wide):
-                    if pixels[j][i] == 0x000000:
-                        tempWorld[i][j] = 0
-                    elif pixels[j][i] == 0xFFFFFF:
-                        tempWorld[i][j] = 1
-                    else: # our void (if we don't create a color it will not error it will render as void)
-                        tempWorld[i][j] = 1
-            self.world = tempWorld
+            mapImage = Image.open(self.path)
+            pixels = mapImage.tobytes()
+            print(pixels)
+            self.wide, self.high = mapImage.size
 
         else:
-            with open(self.path + "..", 'r') as f:
+            with open(self.path, 'r') as f:
                 reader = csv.reader(f)
+                # assets/lost_woods_terrain.lvl lost_woods_terrain.lvl
                 contents = list(reader)
-            # How many tiles wide is our world?
-            self.wide = int(contents[0][0])
-            # And how tall?
-            self.high = int(contents[1][0])
-            # Sprite numbers for all tiles are in the
-            # multidimensional list "world".
-            self.world = contents[2:]
+        # How many tiles wide is our world?
+        self.wide = int(contents[0][0])
+        # And how tall?
+        self.high = int(contents[1][0])
+        # Sprite numbers for all tiles are in the
+        # multidimensional list "world".
+        self.world = contents[2:]
         a = 0
         for i in self.world:
             b = 0
