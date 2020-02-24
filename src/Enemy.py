@@ -320,7 +320,8 @@ class Enemy(Character):
         return math.sqrt(abs(math.pow(y2 - y1, 2) + math.pow(x2 - x1, 2)))
 
     def knockback(self):
-        print("knockback")
+        pass
+        #print("knockback")
         # if self.m_e_d:
         #     self.y = self.y - 50
         #     self.update(0)
