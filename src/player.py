@@ -92,7 +92,7 @@ class Player(Character):
         # What sprites am I not allowd to cross?
         self.blocks = pygame.sprite.Group()
         # Which collision detection function?
-        self.collide_function = pygame.sprite.collide_circle
+        self.collide_function = pygame.sprite.collide_rect
         self.collisions = []
         # For collision detection, we need to compare our sprite
         # with collideable sprites.  However, we have to remap
@@ -101,7 +101,7 @@ class Player(Character):
         # don't have to create more memory each iteration of
         # collision detection.
         self.collider = Drawable()
-        self.collider.image = pygame.Surface([Settings.tile_size, Settings.tile_size])
+        self.collider.image = pygame.Surface([12,12])
         self.collider.rect = self.collider.image.get_rect()
         # Overlay
         self.font = pygame.font.Font('freesansbold.ttf',32)
@@ -241,7 +241,7 @@ class Player(Character):
 
         for sprite in self.blocks:
             self.collider.rect.x= sprite.x
-            self.collider.rect.y = sprite.y
+            self.collider.rect.y = sprite.y - 32
             if pygame.sprite.collide_rect(self, self.collider):
                 self.collisions.append(sprite)
     def reset_frame(self):
