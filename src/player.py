@@ -49,6 +49,14 @@ class Player(Character):
 
         self.state_time = 0
 
+        engine.key_events[pygame.K_a] = self.move_left
+        engine.key_events[pygame.K_d] = self.move_right
+        engine.key_events[pygame.K_w] = self.move_up
+        engine.key_events[pygame.K_s] = self.move_down
+        engine.key_events[pygame.K_s] = self.move_down
+        engine.key_events[pygame.K_o] = self.melee
+        engine.key_events[pygame.K_p] = self.range
+
         ## Walk sprites
         self.walk_length = 9
         raw_walk_sprites = Spritesheet('../assets/plate_walk.png', 64, self.walk_length)
@@ -208,8 +216,9 @@ class Player(Character):
         pass
 
         if (self.current_frame is 5):
-            arrow_noise = pygame.mixer.Sound("../assets/attack_noise.wav")
-            arrow_noise.play()
+            #arrow_noise = pygame.mixer.Sound("../assets/attack_noise.wav")
+            #arrow_noise.play()
+            pass
 
 
     def range(self, time):
@@ -218,8 +227,8 @@ class Player(Character):
 
             if (self.current_frame is 9):
                 arrow = Arrow(self.arrow_image, self.direction, self.engine, 3,self.x + 31,self.y + 31)
-                arrow_noise = pygame.mixer.Sound("../assets/attack_noise.wav")
-                arrow_noise.play()
+                #arrow_noise = pygame.mixer.Sound("../assets/attack_noise.wav")
+                #arrow_noise.play()
 
                 self.arrows.append(arrow)
 
