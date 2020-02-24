@@ -5,6 +5,7 @@ import sys
 import math
 from player import Player
 from screen import Screen
+from overlay import Overlay
 sys.path.append('..')
 import league
 
@@ -22,6 +23,10 @@ def main():
 
     user = Player(engine, 5, 10)
     engine.objects.append(user)
+
+    overlay = Overlay(user)
+    engine.drawables.add(overlay)
+    engine.objects.append(overlay)
 
     screen = Screen(user, engine)
 
