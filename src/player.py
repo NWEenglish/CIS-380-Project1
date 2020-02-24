@@ -97,11 +97,11 @@ class Player(Character):
 
         self.image = pygame.transform.scale(self.image, (64, 64))
         # How big the world is, so we can check for boundries
-        self.world_size = (Settings.width, Settings.height)
+        self.world_size = (12,12)
         # What sprites am I not allowd to cross?
         self.blocks = pygame.sprite.Group()
         # Which collision detection function?
-        self.collide_function = pygame.sprite.collide_circle
+        self.collide_function = pygame.sprite.collide_rect
         self.collisions = []
         # For collision detection, we need to compare our sprite
         # with collideable sprites.  However, we have to remap
@@ -250,8 +250,8 @@ class Player(Character):
         #divide fps by delta and state to step to next frame
 
         for sprite in self.blocks:
-            self.collider.rect.x = sprite.x
-            self.collider.rect.y = sprite.y
+            self.collider.rect.x = sprite.x - 16
+            self.collider.rect.y = sprite.y - 32
             if pygame.sprite.collide_rect(self, self.collider):
                 self.collisions.append(sprite)
     def reset_frame(self):
