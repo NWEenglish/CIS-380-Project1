@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-import league
+# import league
 import pygame
 import sys
 import math
 from player import Player
 from screen import Screen
 sys.path.append('..')
+import league
+
 
 
 def main():

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import pygame
+import time
+import math
 import sys
 sys.path.append('..')
 from league import *
@@ -20,17 +22,30 @@ class Enemy(Character):
         self.m_e_u = False
         self.m_e_r = False
         self.m_e_l = False
-        self.move_enemy_right = pygame.USEREVENT + 1
-        self.move_enemy_left = pygame.USEREVENT + 2
-        self.move_enemy_up = pygame.USEREVENT + 3
-        self.move_enemy_down = pygame.USEREVENT + 4
-        self.move_enemy_idle = pygame.USEREVENT + 5
+        self.m_e_i = False
+        self.move_enemy_right = pygame.USEREVENT + 0
+        self.move_enemy_left = pygame.USEREVENT + 1
+        self.move_enemy_up = pygame.USEREVENT + 2
+        self.move_enemy_down = pygame.USEREVENT + 3
+        self.attack_enemy_north = pygame.USEREVENT + 4
+        self.attack_enemy_south = pygame.USEREVENT + 5
+        self.attack_enemy_east = pygame.USEREVENT + 6
+        self.attack_enemy_west = pygame.USEREVENT + 7
 
         engine.events[self.move_enemy_right] = self.move_right
         engine.events[self.move_enemy_left] = self.move_left
         engine.events[self.move_enemy_up] = self.move_up
         engine.events[self.move_enemy_down] = self.move_down
-        engine.events[self.move_enemy_idle] = self.move_idle
+        engine.events[self.attack_enemy_north] = self.attack_north
+        engine.events[self.attack_enemy_south] = self.attack_south
+        engine.events[self.attack_enemy_east] = self.attack_east
+        engine.events[self.attack_enemy_west] = self.attack_west
+
+        # First sprite sheet
+        self.first_spritesheet = walk_img
+
+        # Second sprite sheet
+        self.second_spritesheet = attack_img
 
         # Reference to the engine
         self.engine = engine
@@ -39,6 +54,10 @@ class Enemy(Character):
         self.health = health
         # Last time I was hit
         self.last_hit = pygame.time.get_ticks()
+
+        # Last time enemy attacked.
+        self.last_attack = time.time()
+
         # A unit-less value.  Bigger is faster.
         self.delta = 256
         # Where the player is positioned
@@ -55,38 +74,6 @@ class Enemy(Character):
         # What frame the object is in
         self.current_frame = 0
 
-        # The objects melee weapon
-        # self.sword = Melee_Weapon(6,0,0, engine, self)
-
-        # self.arrow_image = pygame.image.load(walk_img).convert_alpha()
-
-        ## Walk sprites
-        self.walk_length = 4
-        raw_walk_sprites = Spritesheet(walk_img, 64, self.walk_length)
-        walk_south = self.get_sprite_set(raw_walk_sprites, 64, self.walk_length, offset=0)
-        walk_north = self.get_sprite_set(raw_walk_sprites, 64, self.walk_length, offset=1)
-        walk_east = self.get_sprite_set(raw_walk_sprites, 64, self.walk_length, offset=2)
-        walk_west = self.get_sprite_set(raw_walk_sprites, 64, self.walk_length, offset=3)
-        walk_sprites = [walk_north, walk_south, walk_east, walk_west]
-
-        ## Attack sprites
-        self.attack_length = 4
-        raw_attack_sprites = Spritesheet(attack_img, 64, self.attack_length)
-        attack_north = self.get_sprite_set(raw_attack_sprites, 64, self.attack_length, offset=0)
-        attack_west = self.get_sprite_set(raw_attack_sprites, 64, self.attack_length, offset=1)
-        attack_south = self.get_sprite_set(raw_attack_sprites, 64, self.attack_length, offset=2)
-        attack_east = self.get_sprite_set(raw_attack_sprites, 64, self.attack_length, offset=3)
-        attack_sprites = [attack_north, attack_south, attack_east, attack_west]
-
-        self.state_sprites = [walk_sprites, attack_sprites]
-
-        self.current_sprite_set = self.state_sprites[self.state.value][self.direction.value]
-
-        # The image to use.  This will change frequently
-        # in an animated Player class.
-        self.image = self.current_sprite_set[0].image.convert_alpha()
-
-        self.image = pygame.transform.scale(self.image, (64, 64))
         # How big the world is, so we can check for boundries
         self.world_size = (Settings.width, Settings.height)
         # What sprites am I not allowd to cross?
@@ -105,10 +92,34 @@ class Enemy(Character):
         self.collider.rect = self.collider.image.get_rect()
         # Overlay
         self.font = pygame.font.Font('freesansbold.ttf',32)
-        self.overlay = self.font.render(str(self.health) + "        4 lives", True, (0,0,0))
+
+        self.update_spritesheet(self.first_spritesheet)
+
+
+    def update_spritesheet(self, spritesheet_image):
+        # Walk sprites
+        self.walk_length = 4
+        raw_walk_sprites = Spritesheet(spritesheet_image, 64, self.walk_length)
+        walk_south = self.get_sprite_set(raw_walk_sprites, 64, self.walk_length, offset=0)
+        walk_north = self.get_sprite_set(raw_walk_sprites, 64, self.walk_length, offset=1)
+        walk_east = self.get_sprite_set(raw_walk_sprites, 64, self.walk_length, offset=2)
+        walk_west = self.get_sprite_set(raw_walk_sprites, 64, self.walk_length, offset=3)
+        walk_sprites = [walk_north, walk_south, walk_east, walk_west]
+
+        self.state_sprites = [walk_sprites]
+
+        self.current_sprite_set = self.state_sprites[self.state.value][self.direction.value]
+
+        self.image = self.current_sprite_set[0].image.convert_alpha()
+
+        self.image = pygame.transform.scale(self.image, (64, 64))
+
 
     def move_left(self, time):
         if not self.setState(State.MOVE):
+
+            self.update_spritesheet(self.first_spritesheet)
+
             if (self.direction == Direction.WEST):
                 self.current_frame = (self.current_frame) % (self.walk_length - 1) + 1
                 self.collisions = []
@@ -130,6 +141,9 @@ class Enemy(Character):
 
     def move_right(self, time):
         if not self.setState(State.MOVE):
+
+            self.update_spritesheet(self.first_spritesheet)
+
             if (self.direction == Direction.EAST):
                 self.current_frame = (self.current_frame) % (self.walk_length - 1) + 1
                 self.collisions = []
@@ -151,6 +165,9 @@ class Enemy(Character):
 
     def move_up(self, time):
         if not self.setState(State.MOVE):
+
+            self.update_spritesheet(self.first_spritesheet)
+
             if (self.direction == Direction.NORTH):
                 self.current_frame = (self.current_frame) % (self.walk_length - 1) + 1
                 self.collisions = []
@@ -173,6 +190,9 @@ class Enemy(Character):
 
     def move_down(self, time):
         if not self.setState(State.MOVE):
+
+            self.update_spritesheet(self.first_spritesheet)
+
             if (self.direction == Direction.SOUTH):
                 self.current_frame = (self.current_frame) % (self.walk_length - 1) + 1
                 self.collisions = []
@@ -195,6 +215,9 @@ class Enemy(Character):
 
     def move_idle(self, time):
         if not self.setState(State.MOVE):
+
+            self.update_spritesheet(self.first_spritesheet)
+
             if (self.direction == Direction.SOUTH):
                 self.current_frame = self.current_frame
                 self.collisions = []
@@ -203,10 +226,8 @@ class Enemy(Character):
                     if self.y + amount > self.world_size[1] - Settings.tile_size:
                         raise OffScreenBottomException
                     else:
-                        self.y = self.y + amount
                         self.update(0)
                         if len(self.collisions) != 0:
-                            self.y = self.y - amount
                             self.update(0)
                             self.collisions = []
                 except:
@@ -215,68 +236,121 @@ class Enemy(Character):
                 self.direction = Direction.SOUTH
                 self.current_frame = 0
 
-    # def attack(self, time):
-    #     self.sword.x = self.x - 64
-    #     self.sword.y = self.y - 64
-    #     self.sword.direction = self.direction
-    #     self.sword.attack_update()
-    #     if not self.setState(State.ATTACK):
-    #         self.current_frame = (self.current_frame + 1) % (self.attack_length)
-    #         self.sword.current_frame = self.current_frame
-    #         self.sword.attack_update()
-    #     else:
-    #         #self.engine.objects.append(self.sword)
-    #         self.engine.drawables.add(self.sword)
-    #     pass
+    def attack_south(self, time):
+        if not self.setState(State.MOVE):
 
-    # def range(self, time):
-    #     if not self.setState(State.RANGE):
-    #         self.current_frame = (self.current_frame + 1) % (self.ranged_length)
-    #
-    #         if (self.current_frame is 9):
-    #             arrow = Arrow(self.arrow_image, self.direction, self.engine, 3,self.x + 31,self.y + 31)
-    #             ooo('length of engine objects is: ')
-    #             print(len(self.engine.objects))
-    #             print()
-    #
-    #         if (self.current_frame is 12):
-    #             self.current_frame = 3
-    #     pass
+            self.update_spritesheet(self.second_spritesheet)
+
+            if (self.direction == Direction.SOUTH):
+                self.current_frame = (self.current_frame) % (self.walk_length - 1) + 1
+                self.collisions = []
+                amount = self.delta * time
+                try:
+                    if self.y + amount > self.world_size[1] - Settings.tile_size:
+                        raise OffScreenBottomException
+                    else:
+                        self.update(0)
+                except:
+                    pass
+            else:
+                self.direction = Direction.SOUTH
+                self.current_frame = 0
+
+    def attack_north(self, time):
+        if not self.setState(State.MOVE):
+
+            self.update_spritesheet(self.second_spritesheet)
+
+            if (self.direction == Direction.NORTH):
+                self.current_frame = (self.current_frame) % (self.walk_length - 1) + 1
+                self.collisions = []
+                amount = self.delta * time
+                try:
+                    if self.y + amount > self.world_size[1] - Settings.tile_size:
+                        raise OffScreenBottomException
+                    else:
+                        self.update(0)
+                except:
+                    pass
+            else:
+                self.direction = Direction.NORTH
+                self.current_frame = 0
+
+    def attack_east(self, time):
+        if not self.setState(State.MOVE):
+
+            self.update_spritesheet(self.second_spritesheet)
+
+            if (self.direction == Direction.EAST):
+                self.current_frame = (self.current_frame) % (self.walk_length - 1) + 1
+                self.collisions = []
+                amount = self.delta * time
+                try:
+                    if self.y + amount > self.world_size[1] - Settings.tile_size:
+                        raise OffScreenBottomException
+                    else:
+                        self.update(0)
+                except:
+                    pass
+            else:
+                self.direction = Direction.EAST
+                self.current_frame = 0
+
+    def attack_west(self, time):
+        if not self.setState(State.MOVE):
+
+            self.update_spritesheet(self.second_spritesheet)
+
+            if (self.direction == Direction.WEST):
+                self.current_frame = (self.current_frame) % (self.walk_length - 1) + 1
+                self.collisions = []
+                amount = self.delta * time
+                try:
+                    if self.y + amount > self.world_size[1] - Settings.tile_size:
+                        raise OffScreenBottomException
+                    else:
+                        self.update(0)
+                except:
+                    pass
+            else:
+                self.direction = Direction.WEST
+                self.current_frame = 0
 
     def distance(self, x1, y1, x2, y2):
         return math.sqrt(abs(math.pow(y2 - y1, 2) + math.pow(x2 - x1, 2)))
 
     def knockback(self):
-        if self.m_e_d:
-            self.y = self.y - 50
-            self.update(0)
-            if len(self.collisions) != 0:
-                self.y = self.y + 50
-                self.update(0)
-                self.collisions.clear()
-        if self.m_e_u:
-            self.y = self.y + 50
-            self.update(0)
-            if len(self.collisions) != 0:
-                self.y = self.y - 50
-                self.update(0)
-                self.collisions.clear()
-        if self.m_e_r:
-            self.x = self.x - 50
-            self.update(0)
-            if len(self.collisions) != 0:
-                self.x = self.x + 50
-                self.update(0)
-                self.collisions.clear()
-        if self.m_e_l:
-            self.x = self.x + 50
-            self.update(0)
-            if len(self.collisions) != 0:
-                self.x = self.x - 50
-                self.update(0)
-                self.collisions.clear()
+        print("knockback")
+        # if self.m_e_d:
+        #     self.y = self.y - 50
+        #     self.update(0)
+        #     if len(self.collisions) != 0:
+        #         self.y = self.y + 50
+        #         self.update(0)
+        #         self.collisions.clear()
+        # if self.m_e_u:
+        #     self.y = self.y + 50
+        #     self.update(0)
+        #     if len(self.collisions) != 0:
+        #         self.y = self.y - 50
+        #         self.update(0)
+        #         self.collisions.clear()
+        # if self.m_e_r:
+        #     self.x = self.x - 50
+        #     self.update(0)
+        #     if len(self.collisions) != 0:
+        #         self.x = self.x + 50
+        #         self.update(0)
+        #         self.collisions.clear()
+        # if self.m_e_l:
+        #     self.x = self.x + 50
+        #     self.update(0)
+        #     if len(self.collisions) != 0:
+        #         self.x = self.x - 50
+        #         self.update(0)
+        #         self.collisions.clear()
 
-    def update(self, time):
+    def update(self, time1):
         self.rect.x = self.x
         self.rect.y = self.y
         self.collisions = []
@@ -292,89 +366,163 @@ class Enemy(Character):
             if pygame.sprite.collide_rect(self, self.collider):
                 self.collisions.append(sprite)
 
-        if self.distance(self.x, self.y, self.user.x, self.user.y) < 2000:
-            #engine.stop(pygame.time)
+            # If player is within range to begin chase
+            if self.distance(self.x, self.y, self.user.x, self.user.y) < 400:
 
-            # Move along the y-axis
-            if self.x - 20 <= self.user.x <= self.x + 20:
+                # Attack player
+                if self.distance(self.x, self.y, self.user.x, self.user.y) < 25:
 
-                # Move down
-                if self.y < self.user.y and not self.m_e_d:
-                    pygame.time.set_timer(self.move_enemy_up, 0)
-                    pygame.time.set_timer(self.move_enemy_right, 0)
-                    pygame.time.set_timer(self.move_enemy_left, 0)
-                    pygame.time.set_timer(self.move_enemy_idle, 0)
+                    # Enemy can attack every 30 seconds
+                    if (time.time() - self.last_attack) > .5:
 
-                    pygame.time.set_timer(self.move_enemy_down, 100)
+                        self.last_attack = time.time()
 
-                    self.m_e_d = True
-                    self.m_e_u = False
-                    self.m_e_r = False
-                    self.m_e_l = False
+                        self.m_e_d = False
+                        self.m_e_u = False
+                        self.m_e_r = False
+                        self.m_e_l = False
+                        self.m_e_i = False
 
-                    #print("move down")
+                        pygame.time.set_timer(self.move_enemy_down, 0)
+                        pygame.time.set_timer(self.move_enemy_right, 0)
+                        pygame.time.set_timer(self.move_enemy_left, 0)
+                        pygame.time.set_timer(self.move_enemy_up, 0)
 
-                # Move up
-                elif self.user.y < self.y and not self.m_e_u:
-                    pygame.time.set_timer(self.move_enemy_down, 0)
-                    pygame.time.set_timer(self.move_enemy_right, 0)
-                    pygame.time.set_timer(self.move_enemy_left, 0)
-                    pygame.time.set_timer(self.move_enemy_idle, 0)
+                        # Attack left
+                        if self.user.x < self.x:
+                            pygame.time.set_timer(self.attack_enemy_east, 0)
+                            pygame.time.set_timer(self.attack_enemy_north, 0)
+                            pygame.time.set_timer(self.attack_enemy_south, 0)
 
-                    pygame.time.set_timer(self.move_enemy_up, 100)
+                            pygame.time.set_timer(self.attack_enemy_west, 200)
 
-                    self.m_e_d = False
-                    self.m_e_u = True
-                    self.m_e_r = False
-                    self.m_e_l = False
+                        # Attack down
+                        elif self.user.y > self.y:
+                            pygame.time.set_timer(self.attack_enemy_east, 0)
+                            pygame.time.set_timer(self.attack_enemy_north, 0)
+                            pygame.time.set_timer(self.attack_enemy_west, 0)
 
-                    #print("move up")
+                            pygame.time.set_timer(self.attack_enemy_south, 200)
 
-            else: #user.x < enemy.x - 200 or user.x > enemy.x + 200:
+                        # Attack right
+                        elif self.x < self.user.x:
+                            pygame.time.set_timer(self.attack_enemy_west, 0)
+                            pygame.time.set_timer(self.attack_enemy_south, 0)
+                            pygame.time.set_timer(self.attack_enemy_north, 0)
 
-                # If enemy is to the left of user, move right
-                if self.x - 200 < self.user.x < self.x and not self.m_e_l:
-                    pygame.time.set_timer(self.move_enemy_up, 0)
-                    pygame.time.set_timer(self.move_enemy_down, 0)
-                    pygame.time.set_timer(self.move_enemy_right, 0)
-                    pygame.time.set_timer(self.move_enemy_idle, 0)
+                            pygame.time.set_timer(self.attack_enemy_east, 200)
 
-                    pygame.time.set_timer(self.move_enemy_left, 100)
+                        # Attack up
+                        else:
+                            pygame.time.set_timer(self.attack_enemy_east, 0)
+                            pygame.time.set_timer(self.attack_enemy_west, 0)
+                            pygame.time.set_timer(self.attack_enemy_south, 0)
 
-                    self.m_e_d = False
-                    self.m_e_u = False
-                    self.m_e_r = False
-                    self.m_e_l = True
+                            pygame.time.set_timer(self.attack_enemy_north, 200)
 
-                    #print("move left")
+                        self.user.ouch()
 
-                # If enemy is to the right of user, move left
-                elif self.x < self.user.x < self.x + 200 and not self.m_e_r:
-                    pygame.time.set_timer(self.move_enemy_up, 0)
-                    pygame.time.set_timer(self.move_enemy_down, 0)
-                    pygame.time.set_timer(self.move_enemy_left, 0)
-                    pygame.time.set_timer(self.move_enemy_idle, 0)
+                        if self.user.health <= 0:
+                            self.user.x = -10000
+                            self.user.y = -10000
 
-                    pygame.time.set_timer(self.move_enemy_right, 100)
+                # Move along the y-axis
+                elif self.x - 20 <= self.user.x <= self.x + 20:
 
-                    self.m_e_d = False
-                    self.m_e_u = False
-                    self.m_e_r = True
-                    self.m_e_l = False
+                    # Move down
+                    if self.y < self.user.y and not self.m_e_d:
+                        pygame.time.set_timer(self.move_enemy_up, 0)
+                        pygame.time.set_timer(self.move_enemy_right, 0)
+                        pygame.time.set_timer(self.move_enemy_left, 0)
+                        pygame.time.set_timer(self.attack_enemy_east, 0)
+                        pygame.time.set_timer(self.attack_enemy_west, 0)
+                        pygame.time.set_timer(self.attack_enemy_north, 0)
+                        pygame.time.set_timer(self.attack_enemy_south, 0)
 
-                    #print("move right")
+                        pygame.time.set_timer(self.move_enemy_down, 100)
+
+                        self.m_e_d = True
+                        self.m_e_u = False
+                        self.m_e_r = False
+                        self.m_e_l = False
+                        self.m_e_i = False
+
+                    # Move up
+                    elif self.user.y < self.y and not self.m_e_u:
+                        pygame.time.set_timer(self.move_enemy_down, 0)
+                        pygame.time.set_timer(self.move_enemy_right, 0)
+                        pygame.time.set_timer(self.move_enemy_left, 0)
+                        pygame.time.set_timer(self.attack_enemy_east, 0)
+                        pygame.time.set_timer(self.attack_enemy_west, 0)
+                        pygame.time.set_timer(self.attack_enemy_north, 0)
+                        pygame.time.set_timer(self.attack_enemy_south, 0)
+
+                        pygame.time.set_timer(self.move_enemy_up, 100)
+
+                        self.m_e_d = False
+                        self.m_e_u = True
+                        self.m_e_r = False
+                        self.m_e_l = False
+                        self.m_e_i = False
+
+                else:
+                    # If enemy is to the left of user, move right
+                    if self.x - 200 < self.user.x < self.x and not self.m_e_l:
+                        pygame.time.set_timer(self.move_enemy_up, 0)
+                        pygame.time.set_timer(self.move_enemy_down, 0)
+                        pygame.time.set_timer(self.move_enemy_right, 0)
+                        pygame.time.set_timer(self.attack_enemy_east, 0)
+                        pygame.time.set_timer(self.attack_enemy_west, 0)
+                        pygame.time.set_timer(self.attack_enemy_north, 0)
+                        pygame.time.set_timer(self.attack_enemy_south, 0)
+
+                        pygame.time.set_timer(self.move_enemy_left, 100)
+
+                        self.m_e_d = False
+                        self.m_e_u = False
+                        self.m_e_r = False
+                        self.m_e_l = True
+                        self.m_e_i = False
+
+                    # If enemy is to the right of user, move left
+                    elif self.x < self.user.x < self.x + 200 and not self.m_e_r:
+                        pygame.time.set_timer(self.move_enemy_up, 0)
+                        pygame.time.set_timer(self.move_enemy_down, 0)
+                        pygame.time.set_timer(self.move_enemy_left, 0)
+                        pygame.time.set_timer(self.attack_enemy_east, 0)
+                        pygame.time.set_timer(self.attack_enemy_west, 0)
+                        pygame.time.set_timer(self.attack_enemy_north, 0)
+                        pygame.time.set_timer(self.attack_enemy_south, 0)
+
+                        pygame.time.set_timer(self.move_enemy_right, 100)
+
+                        self.m_e_d = False
+                        self.m_e_u = False
+                        self.m_e_r = True
+                        self.m_e_l = False
+                        self.m_e_i = False
 
             # Idle
-            # elif user.y - 20 <= enemy.y <= user.y + 20:
-            #     pygame.time.set_timer(move_enemy_down, 0)
-            #     pygame.time.set_timer(move_enemy_right, 0)
-            #     pygame.time.set_timer(move_enemy_left, 0)
-            #     pygame.time.set_timer(move_enemy_up, 0)
-            #
-            #     pygame.time.set_timer(move_enemy_idle, 100)
+            else:
 
-        #engine.run()
-        # engine.stop(pygame.time)
+                self.m_e_d = False
+                self.m_e_u = False
+                self.m_e_r = False
+                self.m_e_l = False
+
+                if not self.m_e_i:
+                    pygame.time.set_timer(self.move_enemy_down, 0)
+                    pygame.time.set_timer(self.move_enemy_right, 0)
+                    pygame.time.set_timer(self.move_enemy_left, 0)
+                    pygame.time.set_timer(self.move_enemy_up, 0)
+                    pygame.time.set_timer(self.attack_enemy_east, 0)
+                    pygame.time.set_timer(self.attack_enemy_west, 0)
+                    pygame.time.set_timer(self.attack_enemy_north, 0)
+                    pygame.time.set_timer(self.attack_enemy_south, 0)
+
+                    self.move_idle(pygame.time)
+
+                    self.m_e_i = True
 
     def ouch(self):
         now = pygame.time.get_ticks()
